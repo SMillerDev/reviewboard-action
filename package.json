@@ -1,0 +1,4 @@
+{
+    "name": "reviewboard-action",
+    "main": "main.sh"
+  }

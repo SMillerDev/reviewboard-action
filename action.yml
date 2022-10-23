@@ -1,0 +1,42 @@
+name: Post ReviewBoard review
+description: Post a review to a ReviewBoard server
+author: SMillerDev
+branding:
+  icon: mail
+  color: yellow
+inputs:
+  token:
+    description: Token to be used for ReviewBoard authentication
+    required: true
+  url:
+    description: ReviewBoard URL
+    required: false
+    default: 'https://demo.reviewboard.org/'
+  review_id:
+    description: ReviewBoard review ID
+    required: false
+    default: ''
+  draft:
+    description: Post the review as draft
+    required: false
+    default: false
+  header:
+    description: Review header
+    required: false
+    default: ''
+  footer:
+    description: Review footer
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - run: |
+        echo "${{ inputs.header }}" > review_header.tmp.md
+        echo "${{ inputs.footer }}" > review_footer.tmp.md
+        "$GITHUB_ACTION_PATH/main.sh" '${{ inputs.review_id }}' '${{ !inputs.draft }}'
+      env:
+        REVIEWBOARD_URL: "${{ inputs.url }}"
+        REVIEWBOARD_API_TOKEN: "${{ inputs.token }}"
+      shell: bash
+      id: post-review
