@@ -1,4 +1,4 @@
-€name: Post ReviewBoard review
+name: Post ReviewBoard review
 description: Post a review to a ReviewBoard server
 author: SMillerDev
 branding:
@@ -33,13 +33,16 @@ runs:
   steps:
     - shell: bash
       id: set-review-header
+      name: Set review header
       run: echo "${{ inputs.header }}" > $GITHUB_ACTION_PATH/review_header.tmp.md
 
     - shell: bash
       id: set-review-footer
+      name: Set review footer
       run: echo "${{ inputs.footer }}" > $GITHUB_ACTION_PATH/review_footer.tmp.md
 
     - shell: bash
+      name: Post review
       id: post-review
       env:
         IS_PUBLIC: "${{ !inputs.draft }}"
