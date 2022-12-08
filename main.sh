@@ -7,7 +7,7 @@ PUBLIC=${2:-"false"}
 
 function cleanup()
 {
-     echo "::debug::cleaning up"
+     echo "::debug::cleaning up $1"
      if [[ -f "$1" ]]; then
           rm "$1"
      fi
