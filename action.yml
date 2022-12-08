@@ -31,12 +31,17 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: |
-        echo "${{ inputs.header }}" > review_header.tmp.md
-        echo "${{ inputs.footer }}" > review_footer.tmp.md
-        "$GITHUB_ACTION_PATH/main.sh" '${{ inputs.review_id }}' '${{ !inputs.draft }}'
+    - shell: bash
+      name: Set review header
+      run: echo "${{ inputs.header }}" > $GITHUB_ACTION_PATH/review_header.tmp.md
+    - shell: bash
+      name: Set review footer
+      run: echo "${{ inputs.footer }}" > $GITHUB_ACTION_PATH/review_footer.tmp.md
+    - shell: bash
+      name: Post review
+      id: post-review
+      run: "$GITHUB_ACTION_PATH/main.sh" ${{ inputs.review_id }} ${{ !inputs.draft }}
       env:
         REVIEWBOARD_URL: "${{ inputs.url }}"
         REVIEWBOARD_API_TOKEN: "${{ inputs.token }}"
-      shell: bash
-      id: post-review
+
