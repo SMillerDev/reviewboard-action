@@ -40,7 +40,7 @@ runs:
     - shell: bash
       name: Post review
       id: post-review
-      run: "$GITHUB_ACTION_PATH/main.sh" ${{ inputs.review_id }} ${{ !inputs.draft }}
+      run: "$GITHUB_ACTION_PATH/main.sh" "${{ inputs.review_id }}" "${{ !inputs.draft }}"
       env:
         REVIEWBOARD_URL: "${{ inputs.url }}"
         REVIEWBOARD_API_TOKEN: "${{ inputs.token }}"
