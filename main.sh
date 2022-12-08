@@ -7,6 +7,7 @@ PUBLIC=${2:-"false"}
 
 function cleanup()
 {
+     echo "::debug::cleaning up"
      if [[ -f "$1" ]]; then
           rm "$1"
      fi
@@ -14,16 +15,19 @@ function cleanup()
 
 function check_api_call()
 {
+     echo "::debug::checking API output"
      if [[ $1 -gt 0 ]]; then
-          echo "API call failed" 1>&2
-          echo "$2"
+          echo "::error title=API issue::API call failed"
+          echo "::notice::${2}"
+
           return 1
      fi
 
      state=$(jq -r .stat <<< "$2")
      if [[ "$state" != "ok" ]]; then
-          echo "API returned not OK" 1>&2
-          echo "$state"
+          echo "::error title=API issue::API returned not OK"
+          echo "::notice::${state}"
+
           return 1
      fi
 }
@@ -32,15 +36,18 @@ cleanup "${COOKIE_JAR}"
 cleanup "review_header.tmp.md"
 cleanup "review_footer.tmp.md"
 
+echo "::debug::calling ${REVIEWBOARD_URL}/api/"
 response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/" \
                 --cookie-jar "${COOKIE_JAR}" \
                 -H "Accept: application/json" \
                 -H "Authorization: token ${API_TOKEN}")
 
-if ! check_api_call $? "${response}"; then
+status=$?
+if ! check_api_call "${status}" "${response}"; then
      exit 1
 fi
 
+echo "::debug::calling ${REVIEWBOARD_URL}/api/review-requests/${review_request_id}/reviews/"
 response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${review_request_id}/reviews/" \
                --cookie "${COOKIE_JAR}" \
                -H "Accept: application/json" \
@@ -51,6 +58,7 @@ response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${review
                --data-binary "body_bottom=$(cat review_footer.tmp.md)" \
                --data 'body_bottom_text_type=markdown')
 
-if ! check_api_call $? "${response}"; then
+status=$?
+if ! check_api_call "${status}" "${response}"; then
      exit 1
 fi
