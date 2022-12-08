@@ -49,4 +49,4 @@ runs:
         REVIEW_ID: "${{ inputs.review_id }}"
         REVIEWBOARD_URL: "${{ inputs.url }}"
         REVIEWBOARD_API_TOKEN: "${{ inputs.token }}"
-      run: "$GITHUB_ACTION_PATH/main.sh" $REVIEW_ID $IS_PUBLIC
+      run: $GITHUB_ACTION_PATH/main.sh "$REVIEW_ID" "$IS_PUBLIC"
