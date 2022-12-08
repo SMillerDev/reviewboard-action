@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
-COOKIE_JAR="cookies.tmp"
-
-review_request_id=$(git show --pretty="format:%b" "HEAD" --no-patch | grep "${REVIEWBOARD_URL}" | sed "s|.*${REVIEWBOARD_URL}/r/\([0-9]*\)/|\1|g")
-REVIEW_ID=${1:-"$review_request_id"}
-PUBLIC=${2:-"false"}
+LOCATION=$(dirname $0)
+COOKIE_JAR="$LOCATION/cookies.tmp"
+if [ -z "$1" ]; then
+  REVIEW_ID=$(git show --pretty="format:%b" "HEAD" --no-patch | grep "${REVIEWBOARD_URL}" | sed "s|.*${REVIEWBOARD_URL}/r/\([0-9]*\)/|\1|g")
+else
+  REVIEW_ID="$1"
+fi
+if [ -z "$2" ]; then
+  PUBLIC="false"
+else
+  PUBLIC="$2"
+fi
 
 function cleanup()
 {
@@ -56,9 +63,9 @@ response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${review
                -H "Accept: application/json" \
                --data 'publish_to_owner_only=true' \
                --data "public=${PUBLIC}" \
-               --data-binary "body_top=$(cat review_header.tmp.md)" \
+               --data-binary "body_top=$(cat $LOCATION/review_header.tmp.md)" \
                --data 'body_top_text_type=markdown' \
-               --data-binary "body_bottom=$(cat review_footer.tmp.md)" \
+               --data-binary "body_bottom=$(cat $LOCATION/review_footer.tmp.md)" \
                --data 'body_bottom_text_type=markdown')
 
 status=$?
