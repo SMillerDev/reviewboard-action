@@ -39,6 +39,7 @@ cleanup "review_footer.tmp.md"
 echo "::debug::calling ${REVIEWBOARD_URL}/api/"
 response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/" \
                 --cookie-jar "${COOKIE_JAR}" \
+                --output - \
                 -H "Accept: application/json" \
                 -H "Authorization: token ${REVIEWBOARD_API_TOKEN}")
 
@@ -51,6 +52,7 @@ fi
 echo "::debug::calling ${REVIEWBOARD_URL}/api/review-requests/${review_request_id}/reviews/"
 response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${review_request_id}/reviews/" \
                --cookie "${COOKIE_JAR}" \
+               --output - \
                -H "Accept: application/json" \
                --data 'publish_to_owner_only=true' \
                --data "public=${PUBLIC}" \
