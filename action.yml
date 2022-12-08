@@ -32,18 +32,18 @@ runs:
   using: composite
   steps:
     - shell: bash
-      name: Set review header
+      id: set-review-header
       run: echo "${{ inputs.header }}" > $GITHUB_ACTION_PATH/review_header.tmp.md
+
     - shell: bash
-      name: Set review footer
+      id: set-review-footer
       run: echo "${{ inputs.footer }}" > $GITHUB_ACTION_PATH/review_footer.tmp.md
+
     - shell: bash
-      name: Post review
       id: post-review
-      run: "$GITHUB_ACTION_PATH/main.sh" $REVIEW_ID $IS_PUBLIC
       env:
         IS_PUBLIC: "${{ !inputs.draft }}"
         REVIEW_ID: "${{ inputs.review_id }}"
         REVIEWBOARD_URL: "${{ inputs.url }}"
         REVIEWBOARD_API_TOKEN: "${{ inputs.token }}"
-
+      run: "$GITHUB_ACTION_PATH/main.sh" $REVIEW_ID $IS_PUBLIC
