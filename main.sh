@@ -40,7 +40,7 @@ echo "::debug::calling ${REVIEWBOARD_URL}/api/"
 response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/" \
                 --cookie-jar "${COOKIE_JAR}" \
                 -H "Accept: application/json" \
-                -H "Authorization: token ${API_TOKEN}")
+                -H "Authorization: token ${REVIEWBOARD_API_TOKEN}")
 
 status=$?
 if ! check_api_call "${status}" "${response}"; then
