@@ -18,7 +18,7 @@ function check_api_call()
      echo "::debug::checking API output"
      if [[ $1 -gt 0 ]]; then
           echo "::error title=API issue::API call failed"
-          echo "::notice::${2}"
+          echo "::debug::return=${1} data=${2}"
 
           return 1
      fi
@@ -26,7 +26,7 @@ function check_api_call()
      state=$(jq -r .stat <<< "$2")
      if [[ "$state" != "ok" ]]; then
           echo "::error title=API issue::API returned not OK"
-          echo "::notice::${state}"
+          echo "::debug::state=${state}"
 
           return 1
      fi
@@ -44,6 +44,7 @@ response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/" \
 
 status=$?
 if ! check_api_call "${status}" "${response}"; then
+     echo "::debug::exiting after main API issue"
      exit 1
 fi
 
@@ -60,5 +61,6 @@ response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${review
 
 status=$?
 if ! check_api_call "${status}" "${response}"; then
+     echo "::debug::exiting after post API issue"
      exit 1
 fi
