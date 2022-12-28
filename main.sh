@@ -6,11 +6,14 @@ if [ -z "$1" ]; then
 else
   REVIEW_ID="$1"
 fi
+echo "::debug::Review ID: ${REVIEW_ID}"
+
 if [ -z "$2" ]; then
   PUBLIC="false"
 else
   PUBLIC="$2"
 fi
+echo "::debug::Public: ${PUBLIC}"
 
 function cleanup()
 {
