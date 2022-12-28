@@ -59,8 +59,8 @@ if ! check_api_call "${status}" "${response}"; then
      exit 1
 fi
 
-echo "::debug::calling ${REVIEWBOARD_URL}/api/review-requests/${review_request_id}/reviews/"
-response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${review_request_id}/reviews/" \
+echo "::debug::calling ${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/"
+response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/" \
                --cookie "${COOKIE_JAR}" \
                --output - \
                -H "Accept: application/json" \
