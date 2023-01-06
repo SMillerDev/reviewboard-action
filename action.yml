@@ -12,14 +12,14 @@ inputs:
     description: ReviewBoard URL
     required: false
     default: 'https://demo.reviewboard.org/'
+  action:
+    description: What to do with the review
+    required: true
+    default: 'comment'
   review_id:
     description: ReviewBoard review ID
     required: false
     default: ''
-  draft:
-    description: Post the review as draft
-    required: false
-    default: false
   header:
     description: Review header
     required: false
