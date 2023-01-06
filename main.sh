@@ -1,19 +1,10 @@
 #!/usr/bin/env bash
 LOCATION=$(dirname $0)
 COOKIE_JAR="$LOCATION/cookies.tmp"
-if [ -z "$1" ]; then
+if [ -z "$REVIEW_ID" ]; then
   REVIEW_ID=$(git show --pretty="format:%b" "HEAD" --no-patch | grep "${REVIEWBOARD_URL}" | sed "s|.*${REVIEWBOARD_URL}/r/\([0-9]*\)/|\1|g")
-else
-  REVIEW_ID="$1"
 fi
 echo "::debug::Review ID: ${REVIEW_ID}"
-
-if [ -z "$2" ]; then
-  PUBLIC="false"
-else
-  PUBLIC="$2"
-fi
-echo "::debug::Public: ${PUBLIC}"
 
 function cleanup()
 {
@@ -59,20 +50,38 @@ if ! check_api_call "${status}" "${response}"; then
      exit 1
 fi
 
-echo "::debug::calling ${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/"
-response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/" \
-               --cookie "${COOKIE_JAR}" \
-               --output - \
-               -H "Accept: application/json" \
-               --data 'publish_to_owner_only=true' \
-               --data "public=${PUBLIC}" \
-               --data-binary "body_top=$(cat $LOCATION/review_header.tmp.md)" \
-               --data 'body_top_text_type=markdown' \
-               --data-binary "body_bottom=$(cat $LOCATION/review_footer.tmp.md)" \
-               --data 'body_bottom_text_type=markdown')
+if [[ "$REVIEW_ACTION" == 'comment' ]]; then
+     echo "::debug::calling ${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/"
+     response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/" \
+                    --cookie "${COOKIE_JAR}" \
+                    --output - \
+                    -H "Accept: application/json" \
+                    --data 'publish_to_owner_only=true' \
+                    --data-binary "body_top=$(cat $LOCATION/review_header.tmp.md)" \
+                    --data 'body_top_text_type=markdown' \
+                    --data-binary "body_bottom=$(cat $LOCATION/review_footer.tmp.md)" \
+                    --data 'body_bottom_text_type=markdown')
+                    # --data "public=${PUBLIC}" \
 
-status=$?
-if ! check_api_call "${status}" "${response}"; then
-     echo "::debug::exiting after post API issue"
-     exit 1
+     status=$?
+     if ! check_api_call "${status}" "${response}"; then
+          echo "::debug::exiting after post API issue"
+          exit 1
+     fi
+elif [[ "$REVIEW_ACTION" == 'publish' ]]; then
+     echo "::debug::publishing ${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/"
+     response=$(curl --silent --fail "${REVIEWBOARD_URL}/api/review-requests/${REVIEW_ID}/reviews/" \
+                    --cookie "${COOKIE_JAR}" \
+                    --output - \
+                    -H "Accept: application/json" \
+                    --data 'public=true')
+
+     status=$?
+     if ! check_api_call "${status}" "${response}"; then
+          echo "::debug::exiting after post API issue"
+          exit 1
+     fi
+else
+  echo "::error title=Unknown action::Review action \"$REVIEW_ACTION\" is not supported!"
+  return 1
 fi

@@ -42,11 +42,11 @@ runs:
       run: echo "${{ inputs.footer }}" > $GITHUB_ACTION_PATH/review_footer.tmp.md
 
     - shell: bash
-      name: Post review
+      name: Post review comment
       id: post-review
       env:
-        IS_PUBLIC: "${{ !inputs.draft }}"
+        REVIEW_ACTION: ${{ inputs.action }}
         REVIEW_ID: "${{ inputs.review_id }}"
         REVIEWBOARD_URL: "${{ inputs.url }}"
         REVIEWBOARD_API_TOKEN: "${{ inputs.token }}"
-      run: $GITHUB_ACTION_PATH/main.sh "$REVIEW_ID" "$IS_PUBLIC"
+      run: $GITHUB_ACTION_PATH/main.sh
